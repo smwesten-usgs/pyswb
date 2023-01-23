@@ -4,7 +4,7 @@ from copy import deepcopy
 
 from pyswb.base.adapter import adapter_factory
 from pyswb.base.control import Control
-from pyswb.constants import fileish
+from pyswb.pyswb_constants import fileish
 
 
 class Model:

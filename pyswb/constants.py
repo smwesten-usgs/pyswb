@@ -5,6 +5,9 @@ from typing import Union
 
 import numpy as np
 
+import sys    
+print("In module constants sys.path[0], __package__ ==", sys.path[0], __package__)
+
 # Environment variables
 numba_num_threads = os.getenv("NUMBA_NUM_THREADS")
 if numba_num_threads is None:

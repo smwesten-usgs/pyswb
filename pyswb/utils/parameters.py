@@ -3,7 +3,7 @@ from copy import deepcopy
 import netCDF4 as nc4
 import numpy as np
 
-from ..constants import fileish, ft2_per_acre, inches_per_foot, listish, ndoy
+from ..pyswb_constants import fileish, ft2_per_acre, inches_per_foot, listish, ndoy
 from .prms5_file_util import PrmsFile
 
 

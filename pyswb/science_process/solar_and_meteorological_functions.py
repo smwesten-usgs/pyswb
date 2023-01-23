@@ -10,6 +10,24 @@ def daylight_hours( omega_s ):
     return 24.0 / pi * omega_s
 
 
+
+def sunrise_sunset_angle__omega_s(latitude, delta):
+    """
+    Return the sunset angle in radians, given the latitude and solar declination, in radians.
+
+    latitude        Latitude, in Radians
+    delta           Solar declination, in Radians
+
+    Implementation follows equation 25, Allen and others (1998).
+    """
+    from numpy import arccos, tan
+
+    omega_s = arccos( - tan(latitude) * tan(delta) )
+    print(f'omega_s: {omega_s}')
+    return omega_s
+
+
+
 def day_angle__Gamma(day_of_year, number_of_days_in_year):
     """
     Return the day angle in Radians.  
@@ -22,7 +40,9 @@ def day_angle__Gamma(day_of_year, number_of_days_in_year):
 
     from math import pi
 
-    return 2.0 * pi * ( day_of_year - 1.0 ) / number_of_days_in_year
+    day_angle = 2.0 * pi * ( day_of_year - 1.0 ) / number_of_days_in_year
+    print(f'day_angle: {day_angle}')
+    return day_angle
 
 
 
@@ -50,6 +70,8 @@ def solar_declination__delta(day_of_year, number_of_days_in_year):
              - 0.002697 * cos( 3.0 * Gamma )                  \
              + 0.00148  * sin( 3.0 * Gamma )
 
+    print(f'Gamma: {Gamma}; delta: {delta}')
+
     return delta
 
 
@@ -65,11 +87,50 @@ def relative_earth_sun_distance__D_r(day_of_year, number_of_days_in_year):
     """
     from math import cos, pi
 
-    D_R = 1.0 + 0.033                                   \
+    d_r = 1.0 + 0.033                                      \
             * cos( 2.0 * pi * day_of_year )                \
             / number_of_days_in_year      
 
-    return D_R
+    print(f'd_r: {d_r}')
+
+    return d_r
+
+
+def extraterrestrial_radiation__Ra(latitude, delta, omega_s, d_r):
+    """
+    Return the extraterrestrial solar radiation for a point above earth, in MJ / m^2 / day
+
+    latitude        latitude in Radians
+    delta           solar declination in Radians
+    omega_s         sunset hour angle in Radians
+    d_r             Inverse relative sun-earth distance (unitless)
+
+    Implemented as equation 21, Allen and others (1998).
+    """
+
+    from numpy import sin, cos, pi
+
+    Gsc = 0.0820   # MJ / m^2 / min
+
+    part_a = omega_s * sin( latitude ) * sin( delta )
+    part_b = cos( latitude ) * cos( delta ) * sin( omega_s )
+
+    Ra = 24.0 * 60.0 * Gsc * d_r * ( part_a + part_b ) / pi
+    return Ra
+
+
+
+def equivalent_evaporation(radiation_energy):
+    """
+    Returns the equivalent depth of water (in millimeters) that would be evaporated
+    per day for a given amount of solar radiation (expressed in MJ/m^2-day).
+
+    radiation_energy        Solar radiation energy expressed in MJ per sq. meter per day
+
+    Implementation follows equation 20, Allen and others (1998).
+    """
+
+    return radiation_energy * 0.408
 
 
 def references():
