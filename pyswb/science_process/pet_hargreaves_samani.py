@@ -1,5 +1,10 @@
-DEGREES_TO_RADIANS =  0.017453292519943295
-RADIANS_TO_DEGREES = 57.29577951308232
+from numpy import nanmax, float_power
+from ..constants import DEGREES_TO_RADIANS, RADIANS_TO_DEGREES
+from .solar_and_meteorological_functions import relative_earth_sun_distance__D_r, \
+                                                solar_declination__delta,         \
+                                                sunrise_sunset_angle__omega_s,    \
+                                                extraterrestrial_radiation__Ra,   \
+                                                equivalent_evaporation
 
 def et0_hargreaves_samani(extraterrestrial_radiation__Ra, air_temp_min, air_temp_max, air_temp_mean, 
                             et_slope=0.0023, et_constant=17.8, et_exponent=0.5):
@@ -11,8 +16,6 @@ def et0_hargreaves_samani(extraterrestrial_radiation__Ra, air_temp_min, air_temp
     Implemented as equation 4 in Hagreaves and Samani (1985) and as equation 50 in Allen and others (1998).
 
     """
-    from numpy import nanmax, float_power
-
     air_temp_delta = air_temp_max - air_temp_min
 
     et0 = nanmax((0.0,
@@ -35,13 +38,7 @@ def calculate_et0_hargreaves_samani(day_of_year, number_of_days_in_year, latitud
     air_temp_min                Minimum daily air temperature, in degrees Celsius
     air_temp_max                Maximum daily air temperature, in degrees Celsius
     air_temp_mean               Mean daily air temperature, in degrees Celsius
-    """
-    from solar_and_meteorological_functions import relative_earth_sun_distance__D_r,   \
-                                                   solar_declination__delta,           \
-                                                   sunrise_sunset_angle__omega_s,      \
-                                                   extraterrestrial_radiation__Ra,     \
-                                                   equivalent_evaporation
-    
+    """    
     latitude_radians = latitude * DEGREES_TO_RADIANS
 
     d_r     = relative_earth_sun_distance__D_r(day_of_year, number_of_days_in_year)
@@ -49,12 +46,6 @@ def calculate_et0_hargreaves_samani(day_of_year, number_of_days_in_year, latitud
     omega_s = sunrise_sunset_angle__omega_s(latitude_radians, delta)
 
     Ra = equivalent_evaporation(extraterrestrial_radiation__Ra(latitude_radians, delta, omega_s, d_r))
-
-    print(f'd_r: {d_r}')
-    print(f'delta: {delta}')
-    print(f'omega_s: {omega_s}')
-    print(f'Ra: {Ra}')
-
     ref_ET = et0_hargreaves_samani(Ra, air_temp_min, air_temp_max, air_temp_mean)
     print(f'ref_ET: {ref_ET}')
     return ref_ET

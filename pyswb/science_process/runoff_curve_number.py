@@ -1,3 +1,6 @@
+from numpy import clip, float_power
+import numpy as np
+
 
 def calculate_cn_S_inches(curve_number):
     """
@@ -27,12 +30,9 @@ def calculate_cn_runoff(inflow, storage_S, initial_abstraction_Ia = 0.05):
     Return the runoff value given the inflow (precip), storage, and initial abstraction. 
     Equation 2-3, Cronshey and others (1986).
     """
- 
-    import numpy as np
-
     Ia = initial_abstraction_Ia
     runoff = np.where(inflow > Ia,
-                            (inflow - Ia * storage_S)^2 / (inflow + (1.0 - Ia) * storage_S),
+                            float_power(inflow - Ia * storage_S, 2.0) / (inflow + (1.0 - Ia) * storage_S),
                             0.0
                      )
 
@@ -48,18 +48,6 @@ def calculate_cn_alternative_S_0_05(storage_S):
     return 1.33 * (storage_S^1.15)
 
 
-elemental function CN_II_to_CN_I(CN_II)   result(CN_I)
-
-    real (c_float), intent(in)  :: CN_II
-    real (c_float)              :: CN_I
-
-    ! The following comes from page 192, eq. 3.145 of "SCS Curve Number Methodology"
-    CN_I = CN_II / (2.281_c_float - 0.01281_c_float * CN_II )
-
-    CN_I = max( CN_I, 30.0_c_float )
-    CN_I = min( CN_I, 100.0_c_float )
-
-  end function CN_II_to_CN_I
 
 def calculate_cn_arc2_to_arc1(curve_number_arc2):
     """
@@ -70,9 +58,6 @@ def calculate_cn_arc2_to_arc1(curve_number_arc2):
     
     Resulting curve numbers are clipped to the range 30-100.
     """
-
-    from numpy import clip
-
     return clip((curve_number_arc2 / (2.281 - 0.01281 * curve_number_arc2 )),      
                 30.0,
                 100.0
@@ -88,13 +73,36 @@ def calculate_cn_arc2_to_arc3(curve_number_arc2):
 
     Resulting curve numbers are clipped to the range 30-100.
     """
-
-    from numpy import clip
-
     return clip((curve_number_arc2 / (0.427 - 0.00573 * curve_number_arc2 )),      
                 30.0,
                 100.0
                )
+
+def adjust_curve_number(curve_number, inflow_5_day_sum, is_growing_season=False, cfgi=0, cfgi_ll=55, cfgi_ul=85):
+
+    ARC_DRY_GROWING = 1.40
+    ARC_DRY_DORMANT = 0.50
+    ARC_WET_GROWING = 2.10
+    ARC_WET_DORMANT = 1.10
+
+    if( cfgi > cfgi_ll ):
+
+        p_er = calculate_probability_of_enhanced_runoff(cfgi, cfgi_ll, cfgi_ul)
+
+        curve_number_adj = curve_number * (1. - p_er) + curve_number_arc3 * p_er
+
+    elif( is_growing_season ):
+
+        curve_number_adj = np.where(inflow_5_day_sum > ARC_WET_GROWING, curve_number_arc3,
+                             np.where(inflow_5_day_sum < ARC_DRY_GROWING, curve_number_arc1, curve_number))
+
+    else:
+
+        curve_number_adj = np.where(inflow_5_day_sum > ARC_WET_DORMANT, curve_number_arc3,
+                             np.where(inflow_5_day_sum < ARC_DRY_DORMANT, curve_number_arc1, curve_number))
+
+    return curve_number_adj
+
 
 
 def cn_references():

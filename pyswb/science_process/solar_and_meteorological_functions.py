@@ -1,3 +1,6 @@
+from numpy import arccos, sin, cos, tan, pi
+
+
 def daylight_hours( omega_s ):
     """
     Calculate the number of daylight hours at a location.
@@ -6,7 +9,6 @@ def daylight_hours( omega_s ):
 
     Implementation follows equation 34, Allen and others (1998).
     """
-    from math import pi
     return 24.0 / pi * omega_s
 
 
@@ -20,10 +22,7 @@ def sunrise_sunset_angle__omega_s(latitude, delta):
 
     Implementation follows equation 25, Allen and others (1998).
     """
-    from numpy import arccos, tan
-
     omega_s = arccos( - tan(latitude) * tan(delta) )
-    print(f'omega_s: {omega_s}')
     return omega_s
 
 
@@ -37,11 +36,7 @@ def day_angle__Gamma(day_of_year, number_of_days_in_year):
 
     Implementation follows equation 1.2.2 in Iqbal (1983)
     """
-
-    from math import pi
-
     day_angle = 2.0 * pi * ( day_of_year - 1.0 ) / number_of_days_in_year
-    print(f'day_angle: {day_angle}')
     return day_angle
 
 
@@ -57,9 +52,6 @@ def solar_declination__delta(day_of_year, number_of_days_in_year):
     Iqbal (1983) reports maximum error of 0.0006 radians; if the last two terms are omitted,
       the reported accuracy drops to 0.0035 radians.
     """
-    
-    from math import sin, cos
-
     Gamma = day_angle__Gamma( day_of_year, number_of_days_in_year )
 
     delta =   0.006918                                        \
@@ -69,8 +61,6 @@ def solar_declination__delta(day_of_year, number_of_days_in_year):
              + 0.000907 * sin( 2.0 * Gamma )                  \
              - 0.002697 * cos( 3.0 * Gamma )                  \
              + 0.00148  * sin( 3.0 * Gamma )
-
-    print(f'Gamma: {Gamma}; delta: {delta}')
 
     return delta
 
@@ -85,13 +75,9 @@ def relative_earth_sun_distance__D_r(day_of_year, number_of_days_in_year):
     Implementation follows equation 23, Allen and others (1998). 
     See also Equation 1.2.3 in Iqbal, Muhammad (1983-09-28).
     """
-    from math import cos, pi
-
     d_r = 1.0 + 0.033                                      \
             * cos( 2.0 * pi * day_of_year )                \
             / number_of_days_in_year      
-
-    print(f'd_r: {d_r}')
 
     return d_r
 
@@ -107,9 +93,6 @@ def extraterrestrial_radiation__Ra(latitude, delta, omega_s, d_r):
 
     Implemented as equation 21, Allen and others (1998).
     """
-
-    from numpy import sin, cos, pi
-
     Gsc = 0.0820   # MJ / m^2 / min
 
     part_a = omega_s * sin( latitude ) * sin( delta )
