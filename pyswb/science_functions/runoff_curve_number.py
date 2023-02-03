@@ -1,4 +1,3 @@
-from numpy import clip, float_power
 import numpy as np
 
 
@@ -32,7 +31,7 @@ def calculate_cn_runoff(inflow, storage_S, initial_abstraction_Ia = 0.05):
     """
     Ia = initial_abstraction_Ia
     runoff = np.where(inflow > Ia,
-                            float_power(inflow - Ia * storage_S, 2.0) / (inflow + (1.0 - Ia) * storage_S),
+                            np.float_power(inflow - Ia * storage_S, 2.0) / (inflow + (1.0 - Ia) * storage_S),
                             0.0
                      )
 
@@ -58,7 +57,7 @@ def calculate_cn_arc2_to_arc1(curve_number_arc2):
     
     Resulting curve numbers are clipped to the range 30-100.
     """
-    return clip((curve_number_arc2 / (2.281 - 0.01281 * curve_number_arc2 )),      
+    return np.clip((curve_number_arc2 / (2.281 - 0.01281 * curve_number_arc2 )),      
                 30.0,
                 100.0
                )
@@ -73,7 +72,7 @@ def calculate_cn_arc2_to_arc3(curve_number_arc2):
 
     Resulting curve numbers are clipped to the range 30-100.
     """
-    return clip((curve_number_arc2 / (0.427 - 0.00573 * curve_number_arc2 )),      
+    return np.clip((curve_number_arc2 / (0.427 - 0.00573 * curve_number_arc2 )),      
                 30.0,
                 100.0
                )

@@ -3,7 +3,7 @@ from pathlib import Path
 import numpy as np
 sys.path.append(str(Path.cwd().parents[0]))
 
-import pyswb.science_process.actual_et_thornthwaite_mather as aet_tm
+import pyswb.science_functions.actual_et_thornthwaite_mather as aet_tm
 
 def test_soil_moisture_equations():
 
