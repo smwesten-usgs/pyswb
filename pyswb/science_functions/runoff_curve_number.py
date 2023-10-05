@@ -78,6 +78,13 @@ def calculate_cn_arc2_to_arc3(curve_number_arc2):
                )
 
 def adjust_curve_number(curve_number, inflow_5_day_sum, is_growing_season=False, cfgi=0, cfgi_ll=55, cfgi_ul=85):
+    """
+    Adjust the curve number depending on the current antecedant runoff condition. This adjustment is discouraged,
+    since apparently further investigation shows that the adjustment values really only applied to certain
+    basins in Texas (Hawkins and others, 2009). Nonetheless, it is preserved here because the original version
+    of SWb makes use of these table values, and also adjusts curve numbers up and down on the basis
+    of the value of the continuous frozen ground index.
+    """
 
     ARC_DRY_GROWING = 1.40
     ARC_DRY_DORMANT = 0.50
@@ -110,6 +117,9 @@ def cn_references():
         for Small Watersheds - Technical release 55: US Dept. of Agriculture, Soil Conservation Service, 
         Engineering Division, accessed at http://www.nrcs.usda.gov/Internet/FSE_DOCUMENTS/16/stelprdb1044171.pdf.
 
+    Hawkins, R.H., Ward, T.J., Woodward, D.E., and Van Mullem, J.A., 2009, Curve number hydrology: American 
+        Society of Civil Engineers, 106 p.
+
     Mishra, S.K., and Singh, V.P., 2003, Soil Conservation Service Curve Number (SCS-CN) Methodology: Water Science
          and Technology Library, Springer Netherlands, Dordrecht, 534 p.
 
@@ -120,7 +130,6 @@ def cn_references():
         Runoff Curve Number Method: Examination of the Initial Abstraction Ratio, 
         in World Water and Environmental Resources Congress 2003,
         American Society of Civil Engineers, Philadelphia, Pennsylvania, p. 1-10.
-
     """
     pass
 
